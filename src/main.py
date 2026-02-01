@@ -35,3 +35,18 @@ async def predict_breast_cancer(breast_cancer_features: BreastCancerData):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/model-info")
+def model_info():
+    return {
+        "model_type": "RandomForestClassifier",
+        "features": [
+            "mean radius",
+            "mean texture",
+            "mean smoothness",
+            "mean perimeter"
+        ],
+        "problem_type": "binary classification",
+        "dataset": "breast cancer wisconsin",
+        "target": {0:"malignant (cancerous)", 1:"benign (non-cancerous)"}
+    }
