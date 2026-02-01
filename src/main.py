@@ -39,14 +39,27 @@ async def predict_breast_cancer(breast_cancer_features: BreastCancerData):
 @app.get("/model-info")
 def model_info():
     return {
+        "model_name": "Breast Cancer Random Forest Classifier",
         "model_type": "RandomForestClassifier",
-        "features": [
-            "mean radius",
-            "mean texture",
-            "mean smoothness",
-            "mean perimeter"
-        ],
-        "problem_type": "binary classification",
-        "dataset": "breast cancer wisconsin",
-        "target": {0:"malignant (cancerous)", 1:"benign (non-cancerous)"}
+        "framework": "scikit-learn",
+        "model_version": "1.0.0",
+        "inference_mode": "batch_and_single"
+    }
+
+@app.get("/dataset-info")
+def dataset_info():
+    return {
+        "dataset_name": "Breast Cancer Wisconsin (Diagnostic)",
+        "source": "sklearn.datasets.load_breast_cancer",
+        "problem_type": "Binary Classification",
+        "feature_schema": {
+            "mean_radius": "float",
+            "mean_texture": "float",
+            "mean_smoothness": "float",
+            "mean_perimeter": "float"
+        },
+        "target_definition": {
+            "0": "malignant",
+            "1": "benign"
+        },
     }
