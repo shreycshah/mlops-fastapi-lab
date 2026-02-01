@@ -11,9 +11,9 @@ def load_data():
     data = load_breast_cancer()
 
     X = data.data
-    # using just three main features for lab purposes
+    # using just four main features for lab purposes
     feature_names = data.feature_names
-    selected_features = ["mean radius", "mean texture", "mean smoothness"]
+    selected_features = ["mean radius", "mean texture", "mean smoothness", "mean perimeter"]
     feature_indices = [list(feature_names).index(f) for f in selected_features]
     X_selected = X[:, feature_indices]
 

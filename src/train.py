@@ -11,7 +11,7 @@ def fit_model(X_train, y_train):
     """
     dt_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
     dt_classifier.fit(X_train, y_train)
-    joblib.dump(dt_classifier, "../model/ml_model.pkl")
+    joblib.dump(dt_classifier, "../ml_model/breast_cancer_model.pkl")
 
 if __name__ == "__main__":
     X, y = load_data()
