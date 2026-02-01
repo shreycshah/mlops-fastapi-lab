@@ -1,7 +1,9 @@
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
-from src.predict import predict_data
+from typing import List
 import numpy as np
+
+from src.predict import predict_data
 
 app = FastAPI()
 
@@ -14,37 +16,10 @@ class BreastCancerData(BaseModel):
 class BreastCancerResponse(BaseModel):
     response : float
 
-
 @app.get("/", status_code=status.HTTP_200_OK)
 async def health_ping():
     return {"status": "healthy"}
 
-
-@app.post("/predict", response_model=BreastCancerResponse)
-async def predict_breast_cancer(breast_cancer_features: BreastCancerData):
-    try:
-        features = np.array([[
-            breast_cancer_features.mean_radius,
-            breast_cancer_features.mean_texture,
-            breast_cancer_features.mean_smoothness,
-            breast_cancer_features.mean_perimeter
-        ]])
-
-        prediction = predict_data(features)
-        return BreastCancerResponse(response=int(prediction[0]))
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/model-info")
-def model_info():
-    return {
-        "model_name": "Breast Cancer Random Forest Classifier",
-        "model_type": "RandomForestClassifier",
-        "framework": "scikit-learn",
-        "model_version": "1.0.0",
-        "inference_mode": "batch_and_single"
-    }
 
 @app.get("/dataset-info")
 def dataset_info():
@@ -63,3 +38,56 @@ def dataset_info():
             "1": "benign"
         },
     }
+
+
+@app.get("/model-info")
+def model_info():
+    return {
+        "model_name": "Breast Cancer Random Forest Classifier",
+        "model_type": "RandomForestClassifier",
+        "framework": "scikit-learn",
+        "model_version": "1.0.0",
+        "inference_mode": "batch_and_single"
+    }
+
+
+@app.post("/predict", response_model=BreastCancerResponse)
+async def predict_breast_cancer(breast_cancer_features: BreastCancerData):
+    try:
+        features = np.array([[
+            breast_cancer_features.mean_radius,
+            breast_cancer_features.mean_texture,
+            breast_cancer_features.mean_smoothness,
+            breast_cancer_features.mean_perimeter
+        ]])
+
+        prediction = predict_data(features)
+        return BreastCancerResponse(response=int(prediction[0]))
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/predict-batch", response_model=list[BreastCancerResponse])
+async def predict_breast_cancer_batch(
+    breast_cancer_features: List[BreastCancerData]
+):
+    try:
+        features = np.array([
+            [
+                item.mean_radius,
+                item.mean_texture,
+                item.mean_smoothness,
+                item.mean_perimeter
+            ]
+            for item in breast_cancer_features
+        ])
+
+        predictions = predict_data(features)
+
+        return [
+            BreastCancerResponse(response=int(pred))
+            for pred in predictions
+        ]
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
